@@ -1,8 +1,8 @@
-package com.ininmm.todoapp
+package com.ininmm.todoapp.ui
 
 import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -11,17 +11,38 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
+import com.ininmm.todoapp.R
+import dagger.android.AndroidInjection
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+import javax.inject.Inject
 
 class TasksActivity : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var appBarConfiguration: AppBarConfiguration
 
+    @Inject
+    lateinit var ioDispatcher: CoroutineDispatcher
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tasks)
-
+        AndroidInjection.inject(this)
         initView()
+
+        GlobalScope.launch {
+            tryIo()
+        }
+    }
+
+    private suspend fun tryIo() {
+        withContext(ioDispatcher) {
+            Timber.i("Current Thread: ${Thread.currentThread().name}")
+        }
     }
 
     private fun initView() {
@@ -29,7 +50,10 @@ class TasksActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         val navController: NavController = findNavController(R.id.nav_host_fragment)
-        appBarConfiguration = AppBarConfiguration.Builder(R.id.tasksFragment, R.id.statisticsFragment)
+        appBarConfiguration = AppBarConfiguration.Builder(
+            R.id.tasksFragment,
+            R.id.statisticsFragment
+        )
             .setDrawerLayout(drawerLayout)
             .build()
         setupActionBarWithNavController(navController, appBarConfiguration)
