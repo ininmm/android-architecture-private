@@ -12,6 +12,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.ininmm.todoapp.R
+import com.ininmm.todoapp.data.ToDoDatabase
+import com.ininmm.todoapp.data.model.Task
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.GlobalScope
@@ -28,6 +30,9 @@ class TasksActivity : AppCompatActivity() {
     @Inject
     lateinit var ioDispatcher: CoroutineDispatcher
 
+    @Inject
+    lateinit var database: ToDoDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tasks)
@@ -35,6 +40,7 @@ class TasksActivity : AppCompatActivity() {
         initView()
 
         GlobalScope.launch {
+            val task = Task(title = "abc", description = "Haha", isCompleted = false)
             tryIo()
         }
     }
