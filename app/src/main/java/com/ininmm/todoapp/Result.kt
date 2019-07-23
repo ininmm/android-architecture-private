@@ -1,5 +1,7 @@
 package com.ininmm.todoapp
 
+import com.ininmm.todoapp.Result.*
+
 sealed class Result<out R> {
 
     data class Success<out T>(val data: T) : Result<T>()
@@ -16,3 +18,6 @@ sealed class Result<out R> {
         }
     }
 }
+
+val Result<*>.succeeded
+    get() = this is Success && data != null

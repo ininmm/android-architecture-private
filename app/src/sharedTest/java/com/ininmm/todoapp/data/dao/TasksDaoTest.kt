@@ -150,7 +150,7 @@ class TasksDaoTest {
         val task = Task("completed", "description", true)
         database.tasksDao().insertTask(task)
 
-        database.tasksDao().deleteCOmpletedTasks()
+        database.tasksDao().deleteCompletedTasks()
 
         val tasks = database.tasksDao().getTasks()
         assertThat(tasks.isEmpty(), `is`(true))
