@@ -36,13 +36,8 @@ class TasksLocalDataSource(
         }
     }
 
-    override suspend fun saveTask(task: Task) = withContext(ioDispatcher) {
-        try {
-            return@withContext Success(tasksDao.insertTask(task))
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Error(e)
-        }
+    override suspend fun saveTask(task: Task) = withContext<Unit>(ioDispatcher) {
+        tasksDao.insertTask(task)
     }
 
     override suspend fun completeTask(task: Task) = withContext(ioDispatcher) {
