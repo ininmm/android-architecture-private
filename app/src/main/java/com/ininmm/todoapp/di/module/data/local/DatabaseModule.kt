@@ -1,31 +1,26 @@
-package com.ininmm.todoapp.di
+package com.ininmm.todoapp.di.module.data.local
 
 import android.content.Context
 import androidx.room.Room
 import com.ininmm.todoapp.data.ToDoDatabase
+import com.ininmm.todoapp.data.ToDoRoomDatabase
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
 
-@Module
-class ApplicationModule {
+@Module(includes = [DatabaseModuleBinds::class])
+class DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideDataBase(context: Context): ToDoDatabase {
+    fun provideDataBase(context: Context): ToDoRoomDatabase {
         return Room.databaseBuilder(
             context.applicationContext,
-            ToDoDatabase::class.java,
+            ToDoRoomDatabase::class.java,
             "Task.db"
         ).build()
     }
 
-    @Singleton
     @Provides
-    fun provideIoDispatcher() = Dispatchers.IO
-
-    @Singleton
-    @Provides
-    fun provideMainDispatcher() = Dispatchers.Main
+    fun provideTasksDao(db: ToDoDatabase) = db.tasksDao()
 }

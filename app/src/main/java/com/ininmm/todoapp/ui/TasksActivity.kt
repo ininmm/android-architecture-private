@@ -12,7 +12,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.ininmm.todoapp.R
-import com.ininmm.todoapp.data.ToDoDatabase
+import com.ininmm.todoapp.data.ToDoRoomDatabase
 import com.ininmm.todoapp.data.model.Task
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineDispatcher
@@ -31,7 +31,7 @@ class TasksActivity : AppCompatActivity() {
     lateinit var ioDispatcher: CoroutineDispatcher
 
     @Inject
-    lateinit var database: ToDoDatabase
+    lateinit var roomDatabase: ToDoRoomDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
