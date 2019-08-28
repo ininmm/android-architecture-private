@@ -1,15 +1,17 @@
 package com.ininmm.todoapp.data.source.local
 
 import com.ininmm.todoapp.Result
-import com.ininmm.todoapp.Result.*
+import com.ininmm.todoapp.Result.Error
+import com.ininmm.todoapp.Result.Success
 import com.ininmm.todoapp.data.dao.TasksDao
 import com.ininmm.todoapp.data.model.Task
 import com.ininmm.todoapp.data.source.TasksDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class TasksLocalDataSource(
+class TasksLocalDataSource @Inject constructor(
     private val tasksDao: TasksDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : TasksDataSource {

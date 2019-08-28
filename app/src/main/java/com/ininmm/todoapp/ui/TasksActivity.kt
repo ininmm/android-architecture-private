@@ -12,8 +12,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.ininmm.todoapp.R
-import com.ininmm.todoapp.data.ToDoRoomDatabase
+import com.ininmm.todoapp.data.ToDoDatabase
 import com.ininmm.todoapp.data.model.Task
+import com.ininmm.todoapp.data.repository.ITasksRepository
+import com.ininmm.todoapp.data.source.local.TasksLocalDataSource
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.GlobalScope
@@ -31,7 +33,13 @@ class TasksActivity : AppCompatActivity() {
     lateinit var ioDispatcher: CoroutineDispatcher
 
     @Inject
-    lateinit var roomDatabase: ToDoRoomDatabase
+    lateinit var roomDatabase: ToDoDatabase
+
+    @Inject
+    lateinit var tasksLocalDataSource: TasksLocalDataSource
+
+    @Inject
+    lateinit var repository: ITasksRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +50,15 @@ class TasksActivity : AppCompatActivity() {
         GlobalScope.launch {
             val task = Task(title = "abc", description = "Haha", isCompleted = false)
             tryIo()
+
+            val tasks = roomDatabase.tasksDao().getTasks()
+            Timber.i("All Tasks from dao: $tasks")
+
+            val tasksLocal = tasksLocalDataSource.getTasks()
+            Timber.i("All Tasks from local data: $tasksLocal")
+
+            val tasksRepository = repository.getTasks()
+            Timber.e("All Tasks from repository: $tasksRepository")
         }
     }
 
@@ -69,7 +86,7 @@ class TasksActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration) ||
-                super.onSupportNavigateUp()
+            super.onSupportNavigateUp()
     }
 
     private fun setupNavigationDrawer() {
