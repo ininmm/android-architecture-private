@@ -1,4 +1,4 @@
-package com.ininmm.todoapp.di
+package com.ininmm.todoapp.di.module
 
 import com.ininmm.todoapp.ui.statistics.StatisticsFragment
 import dagger.Binds

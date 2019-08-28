@@ -6,7 +6,7 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.ininmm.todoapp.MainCoroutineRule
-import com.ininmm.todoapp.data.ToDoDatabase
+import com.ininmm.todoapp.data.ToDoRoomDatabase
 import com.ininmm.todoapp.data.model.Task
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
@@ -19,13 +19,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class TasksDaoTest {
 
-    private lateinit var database: ToDoDatabase
+    private lateinit var roomDatabase: ToDoRoomDatabase
 
     @ExperimentalCoroutinesApi
     @get:Rule
@@ -36,25 +35,25 @@ class TasksDaoTest {
 
     @Before
     fun setup() {
-        database = Room.inMemoryDatabaseBuilder(
+        roomDatabase = Room.inMemoryDatabaseBuilder(
             getApplicationContext(),
-            ToDoDatabase::class.java
+            ToDoRoomDatabase::class.java
         ).allowMainThreadQueries().build()
     }
 
     @After
     fun dropdown() {
-        database.close()
+        roomDatabase.close()
     }
 
     @Test
     fun when_insert_task_then_get_by_id_success() = runBlockingTest {
         // Given
         val task = Task("title", "description")
-        database.tasksDao().insertTask(task)
+        roomDatabase.tasksDao().insertTask(task)
 
         // When
-        val loaded = database.tasksDao().getTaskById(task.id)
+        val loaded = roomDatabase.tasksDao().getTaskById(task.id)
 
         // Then
         assertThat<Task>(loaded as Task, notNullValue())
@@ -67,12 +66,12 @@ class TasksDaoTest {
     @Test
     fun when_insert_test_but_replace_on_conflict_then_get_by_id_success() = runBlockingTest {
         val task = Task("title", "description")
-        database.tasksDao().insertTask(task)
+        roomDatabase.tasksDao().insertTask(task)
 
         val newTask = Task("title2", "description2", true, task.id)
-        database.tasksDao().insertTask(newTask)
+        roomDatabase.tasksDao().insertTask(newTask)
 
-        val loaded = database.tasksDao().getTaskById(task.id)
+        val loaded = roomDatabase.tasksDao().getTaskById(task.id)
         assertThat(loaded?.id, `is`(task.id))
         assertThat(loaded?.title, `is`(newTask.title))
         assertThat(loaded?.description, `is`(newTask.description))
@@ -83,9 +82,9 @@ class TasksDaoTest {
     fun when_insert_task_then_get_tasks_success() = runBlockingTest {
 
         val task = Task("title", "description")
-        database.tasksDao().insertTask(task)
+        roomDatabase.tasksDao().insertTask(task)
 
-        val tasks = database.tasksDao().getTasks()
+        val tasks = roomDatabase.tasksDao().getTasks()
 
         assertThat(tasks.size, `is`(1))
         assertThat(tasks[0].id, `is`(task.id))
@@ -97,12 +96,12 @@ class TasksDaoTest {
     @Test
     fun when_update_task_then_get_by_id_success() = runBlockingTest {
         val originalTask = Task("title", "description")
-        database.tasksDao().insertTask(originalTask)
+        roomDatabase.tasksDao().insertTask(originalTask)
 
         val updateTask = Task("new title", "new description", true, originalTask.id)
-        database.tasksDao().updateTask(updateTask)
+        roomDatabase.tasksDao().updateTask(updateTask)
 
-        val loaded = database.tasksDao().getTaskById(originalTask.id)
+        val loaded = roomDatabase.tasksDao().getTaskById(originalTask.id)
         assertThat(loaded?.id, `is`(originalTask.id))
         assertThat(loaded?.title, `is`("new title"))
         assertThat(loaded?.description, `is`("new description"))
@@ -112,11 +111,11 @@ class TasksDaoTest {
     @Test
     fun when_update_complete_then_get_by_id_success() = runBlockingTest {
         val task = Task("title", "description", true)
-        database.tasksDao().insertTask(task)
+        roomDatabase.tasksDao().insertTask(task)
 
-        database.tasksDao().updateComplete(task.id, false)
+        roomDatabase.tasksDao().updateComplete(task.id, false)
 
-        val loaded = database.tasksDao().getTaskById(task.id)
+        val loaded = roomDatabase.tasksDao().getTaskById(task.id)
         assertThat(loaded?.id, `is`(task.id))
         assertThat(loaded?.title, `is`(task.title))
         assertThat(loaded?.description, `is`(task.description))
@@ -126,33 +125,33 @@ class TasksDaoTest {
     @Test
     fun when_delete_task_by_id_then_get_tasks_empty() = runBlockingTest {
         val task = Task("title", "description")
-        database.tasksDao().insertTask(task)
+        roomDatabase.tasksDao().insertTask(task)
 
-        database.tasksDao().deleteTaskById(task.id)
+        roomDatabase.tasksDao().deleteTaskById(task.id)
 
-        val tasks = database.tasksDao().getTasks()
+        val tasks = roomDatabase.tasksDao().getTasks()
         assertThat(tasks.isEmpty(), `is`(true))
     }
 
     @Test
     fun when_delete_tasks_then_get_tasks_empty() = runBlockingTest {
         val task = Task("title", "description")
-        database.tasksDao().insertTask(task)
+        roomDatabase.tasksDao().insertTask(task)
 
-        database.tasksDao().deleteTasks()
+        roomDatabase.tasksDao().deleteTasks()
 
-        val tasks = database.tasksDao().getTasks()
+        val tasks = roomDatabase.tasksDao().getTasks()
         assertThat(tasks.isEmpty(), `is`(true))
     }
 
     @Test
     fun when_delete_completed_tasks_then_get_tasks_empty() = runBlockingTest {
         val task = Task("completed", "description", true)
-        database.tasksDao().insertTask(task)
+        roomDatabase.tasksDao().insertTask(task)
 
-        database.tasksDao().deleteCompletedTasks()
+        roomDatabase.tasksDao().deleteCompletedTasks()
 
-        val tasks = database.tasksDao().getTasks()
+        val tasks = roomDatabase.tasksDao().getTasks()
         assertThat(tasks.isEmpty(), `is`(true))
     }
 }

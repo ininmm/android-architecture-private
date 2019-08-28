@@ -7,7 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.ininmm.todoapp.MainCoroutineRule
 import com.ininmm.todoapp.Result.Success
-import com.ininmm.todoapp.data.ToDoDatabase
+import com.ininmm.todoapp.data.ToDoRoomDatabase
 import com.ininmm.todoapp.data.model.Task
 import com.ininmm.todoapp.data.source.local.TasksLocalDataSource
 import com.ininmm.todoapp.succeeded
@@ -31,7 +31,7 @@ import org.junit.runner.RunWith
 class TasksLocalDataSourceTest {
 
     private lateinit var localDataSource: TasksLocalDataSource
-    private lateinit var database: ToDoDatabase
+    private lateinit var roomDatabase: ToDoRoomDatabase
 
     @ExperimentalCoroutinesApi
     @get:Rule
@@ -42,18 +42,18 @@ class TasksLocalDataSourceTest {
 
     @Before
     fun setup() {
-        database = Room.inMemoryDatabaseBuilder(
+        roomDatabase = Room.inMemoryDatabaseBuilder(
             ApplicationProvider.getApplicationContext(),
-            ToDoDatabase::class.java
+            ToDoRoomDatabase::class.java
         )
             .allowMainThreadQueries()
             .build()
-        localDataSource = TasksLocalDataSource(database.tasksDao(), Dispatchers.Main)
+        localDataSource = TasksLocalDataSource(roomDatabase.tasksDao(), Dispatchers.Main)
     }
 
     @After
     fun dropDown() {
-        database.close()
+        roomDatabase.close()
     }
 
     @Test
