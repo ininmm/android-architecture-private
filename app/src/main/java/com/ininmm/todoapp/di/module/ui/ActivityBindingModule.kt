@@ -9,6 +9,7 @@ import dagger.android.ContributesAndroidInjector
 @Module
 abstract class ActivityBindingModule {
     // Android Activity Injector 依此類推
+    @ActivityScoped
     @ContributesAndroidInjector(
         modules = [
             TasksActivityBinds::class,
