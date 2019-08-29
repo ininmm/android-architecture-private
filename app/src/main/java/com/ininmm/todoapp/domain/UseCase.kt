@@ -6,9 +6,8 @@ import com.ininmm.todoapp.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
-abstract class UseCase<in P, R> @Inject constructor(private val ioDispatcher: CoroutineDispatcher) {
+abstract class UseCase<in P, R>(private val ioDispatcher: CoroutineDispatcher) {
     suspend operator fun invoke(parameters: P, result: MutableLiveData<Result<R>>) {
         withContext(ioDispatcher) {
             try {
