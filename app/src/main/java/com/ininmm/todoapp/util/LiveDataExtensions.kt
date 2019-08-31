@@ -31,7 +31,7 @@ inline fun <T> LiveData<Event<T>>.observeEvent(
 
 inline fun <T> LiveData<Event<T>>.observeEventNotNull(
     owner: LifecycleOwner,
-    crossinline eventObserver: (T?) -> Unit
+    crossinline eventObserver: (T) -> Unit
 ) {
     this.observe(owner, EventObserver { it?.run(eventObserver) })
 }

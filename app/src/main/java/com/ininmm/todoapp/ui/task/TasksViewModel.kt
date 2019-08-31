@@ -5,17 +5,26 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.ininmm.todoapp.Event
 import com.ininmm.todoapp.R
-import com.ininmm.todoapp.Result
+import com.ininmm.todoapp.Result.Error
 import com.ininmm.todoapp.Result.Success
 import com.ininmm.todoapp.data.model.Task
+import com.ininmm.todoapp.domain.ActivateTaskUseCase
+import com.ininmm.todoapp.domain.ClearCompletedTasksUseCase
+import com.ininmm.todoapp.domain.CompleteTaskUseCase
 import com.ininmm.todoapp.domain.GetTasksUseCase
+import com.ininmm.todoapp.ui.ADD_EDIT_RESULT_OK
+import com.ininmm.todoapp.ui.DELETE_RESULT_OK
+import com.ininmm.todoapp.ui.EDIT_RESULT_OK
 import com.ininmm.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 class TasksViewModel @Inject constructor(
-    private val getTasksUseCase: GetTasksUseCase
+    private val getTasksUseCase: GetTasksUseCase,
+    private val clearCompletedTasksUseCase: ClearCompletedTasksUseCase,
+    private val completeTaskUseCase: CompleteTaskUseCase,
+    private val activateTaskUseCase: ActivateTaskUseCase
 ) : ViewModel() {
 
     private val _items = MediatorLiveData<List<Task>>().apply {
@@ -44,8 +53,8 @@ class TasksViewModel @Inject constructor(
     val tasksAddViewVisible: LiveData<Boolean>
         get() = _tasksAddViewVisible
 
-    private val _snackbarText = MediatorLiveData<Event<Int>>()
-    val snackbarText: LiveData<Event<Int>> = _snackbarText
+    private val _snackbarMessage = MediatorLiveData<Event<Int>>()
+    val snackbarMessage: LiveData<Event<Int>> = _snackbarMessage
 
     private val _openTaskEvent = MediatorLiveData<Event<String>>()
     val openTaskEvent: LiveData<Event<String>> = _openTaskEvent
@@ -66,7 +75,42 @@ class TasksViewModel @Inject constructor(
         setFiltering(TasksFilterType.ALL_TASKS)
     }
 
-    private fun setFiltering(requestType: TasksFilterType) {
+    fun loadTasks(forceUpdate: Boolean) {
+        _dataLoading.value = true
+        isDataLoadingError.removeSource(getTasksUseCase.observe())
+
+        wrapEspressoIdlingResource {
+            viewModelScope.launch {
+                isDataLoadingError.addSource(getTasksUseCase.observe()) {
+
+                    when (it) {
+                        is Success -> {
+                            isDataLoadingError.postValue(false)
+                            _openTaskEvent.postValue(Event(it.data[0].id))
+                            Timber.e("Success:Snackbar post")
+                            _items.postValue(it.data)
+                        }
+                        is Error -> {
+                            isDataLoadingError.postValue(true)
+                            _openTaskEvent.postValue(Event(it.exception.message.toString()))
+                            _items.postValue(emptyList())
+                            showSnackbarMessage(R.string.loading_tasks_error)
+                            Timber.e("Error:Snackbar post")
+                        }
+                    }
+                    _dataLoading.value = false
+                }
+                getTasksUseCase.execute(
+                    GetTasksUseCase.Params(
+                        forceUpdate,
+                        _currentFiltering
+                    )
+                )
+            }
+        }
+    }
+
+    fun setFiltering(requestType: TasksFilterType) {
         _currentFiltering = requestType
 
         when (requestType) {
@@ -97,6 +141,49 @@ class TasksViewModel @Inject constructor(
         }
     }
 
+    fun clearCompletedTasks() {
+        viewModelScope.launch {
+            clearCompletedTasksUseCase(Unit)
+            showSnackbarMessage(R.string.completed_tasks_cleared)
+            loadTasks(false)
+        }
+    }
+
+    fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
+        if (completed) {
+            completeTaskUseCase(CompleteTaskUseCase.Params(task))
+            showSnackbarMessage(R.string.tasks_marked_complete)
+        } else {
+            activateTaskUseCase(ActivateTaskUseCase.Params(task))
+            showSnackbarMessage(R.string.task_marked_active)
+        }
+
+        loadTasks(false)
+    }
+
+    /**
+     * Called by Data Binding
+     */
+    fun addNewTask() {
+        _newTaskEvent.value = Event(Unit)
+    }
+
+    fun openTask(taskid: String) {
+        _openTaskEvent.value = Event(taskid)
+    }
+
+    fun showEditResultMessage(result: Int) {
+        when (result) {
+            EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_saved_task_message)
+            ADD_EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_added_task_message)
+            DELETE_RESULT_OK -> showSnackbarMessage(R.string.successfully_deleted_task_message)
+        }
+    }
+
+    fun refresh() {
+        loadTasks(true)
+    }
+
     private fun setFilter(
         @StringRes filteringLabelString: Int,
         @StringRes noTasksLabelString: Int,
@@ -109,60 +196,8 @@ class TasksViewModel @Inject constructor(
         _tasksAddViewVisible.value = tasksAddVisible
     }
 
-    fun loadTask(forceUpdate: Boolean) {
-        _dataLoading.value = true
-        isDataLoadingError.removeSource(getTasksUseCase.observe())
-
-        wrapEspressoIdlingResource {
-            viewModelScope.launch {
-                isDataLoadingError.addSource(getTasksUseCase.observe()) {
-                    if (it is Result.Error) {
-                        isDataLoadingError.postValue(true)
-                        _openTaskEvent.postValue(Event(it.exception.message.toString()))
-                        _items.postValue(emptyList())
-                        Timber.e("Error:Snackbar post")
-                    } else if (it is Success) {
-                        isDataLoadingError.postValue(false)
-                        _openTaskEvent.postValue(Event(it.data[0].id))
-                        Timber.e("Success:Snackbar post")
-                        _items.postValue(it.data)
-                    }
-                }
-                getTasksUseCase.execute(
-                    GetTasksUseCase.Params(
-                        true,
-                        _currentFiltering
-                    )
-                )
-            }
-        }
-
-//        wrapEspressoIdlingResource {
-//            viewModelScope.launch {
-//                isDataLoadingError.removeSource(getTasksUseCase.observe())
-//                isDataLoadingError.addSource(getTasksUseCase.observe()) {
-//                    if (it is Success) {
-//                        isDataLoadingError.value = false
-//                        _items.value = it.data
-//                    } else {
-//                        isDataLoadingError.value = true
-//                        _items.value = emptyList()
-//                        showSnackbarMessage(R.string.loading_tasks_error)
-//                    }
-//                    _dataLoading.value = false
-//                }
-//                getTasksUseCase.execute(
-//                    GetTasksUseCase.Params(
-//                        forceUpdate,
-//                        _currentFiltering
-//                    )
-//                )
-//            }
-//        }
-    }
-
     private fun showSnackbarMessage(message: Int) {
-        _snackbarText.value = Event(message)
+        _snackbarMessage.value = Event(message)
     }
 }
 

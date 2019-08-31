@@ -1,6 +1,7 @@
 package com.ininmm.todoapp.data.repository
 
 import com.google.common.truth.Truth
+import com.ininmm.todoapp.MainCoroutineRule
 import com.ininmm.todoapp.Result.Error
 import com.ininmm.todoapp.Result.Success
 import com.ininmm.todoapp.data.model.Task
@@ -14,11 +15,15 @@ import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.net.ConnectException
 
 @ExperimentalCoroutinesApi
 class TasksRepositoryTest {
+
+    @get:Rule
+    var mainCoroutineRule = MainCoroutineRule()
 
     private lateinit var tasksLocalDataSource: TasksDataSource
     private lateinit var tasksRemoteDataSource: TasksDataSource
@@ -34,7 +39,7 @@ class TasksRepositoryTest {
         tasksRepository = TasksRepository(
             tasksRemoteDataSource,
             tasksLocalDataSource,
-            Dispatchers.Unconfined
+            Dispatchers.Main
         )
     }
 

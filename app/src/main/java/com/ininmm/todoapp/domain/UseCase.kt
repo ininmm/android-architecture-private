@@ -7,7 +7,14 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
+/**
+ * 使用 [CoroutineDispatcher] 處理邏輯的同步與非同步
+ */
 abstract class UseCase<in P, R>(private val ioDispatcher: CoroutineDispatcher) {
+
+    /**
+     * 非同步處理邏輯並將結果封裝為 [Result] 放入 [MutableLiveData]
+     */
     suspend operator fun invoke(parameters: P, result: MutableLiveData<Result<R>>) {
         withContext(ioDispatcher) {
             try {
@@ -21,12 +28,18 @@ abstract class UseCase<in P, R>(private val ioDispatcher: CoroutineDispatcher) {
         }
     }
 
+    /**
+     * 非同步處理邏輯並將結果封裝為帶著 [Result] 的 [LiveData] 回傳
+     */
     suspend operator fun invoke(parameters: P): LiveData<Result<R>> {
         val liveCallback: MutableLiveData<Result<R>> = MutableLiveData()
         this(parameters, liveCallback)
         return liveCallback
     }
 
+    /**
+     * 同步執行程式，回傳 [Result]
+     */
     suspend fun executeNow(parameters: P): Result<R> {
         return try {
             Result.Success(execute(parameters))
@@ -35,6 +48,9 @@ abstract class UseCase<in P, R>(private val ioDispatcher: CoroutineDispatcher) {
         }
     }
 
+    /**
+     * override 此方法並把邏輯寫在這裡
+     */
     @Throws(RuntimeException::class)
     protected abstract suspend fun execute(parameters: P): R
 }

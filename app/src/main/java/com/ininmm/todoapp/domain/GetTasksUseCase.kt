@@ -8,7 +8,6 @@ import com.ininmm.todoapp.ui.task.TasksFilterType
 import com.ininmm.todoapp.ui.task.TasksFilterType.*
 import com.ininmm.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.CoroutineDispatcher
-import timber.log.Timber
 import javax.inject.Inject
 
 class GetTasksUseCase @Inject constructor(
@@ -18,28 +17,33 @@ class GetTasksUseCase @Inject constructor(
     override suspend fun execute(parameters: Params) {
         wrapEspressoIdlingResource {
 
-            val tasksResult = tasksRepository.getTasks(parameters.forceUpdate)
+            try {
+                val (forceUpdate, currentFiltering) = parameters
+                val tasksResult = tasksRepository.getTasks(forceUpdate)
 
-            if (tasksResult is Success && parameters.currentFiltering != ALL_TASKS) {
-                val tasks = tasksResult.data
+                if (tasksResult is Success && currentFiltering != ALL_TASKS) {
+                    val tasks = tasksResult.data
 
-                val tasksToShow = mutableListOf<Task>()
+                    val tasksToShow = mutableListOf<Task>()
 
-                for (task in tasks) {
-                    when (parameters.currentFiltering) {
-                        ACTIVE_TASKS -> if (task.isActive) {
-                            tasksToShow.add(task)
+                    for (task in tasks) {
+                        when (currentFiltering) {
+                            ACTIVE_TASKS -> if (task.isActive) {
+                                tasksToShow.add(task)
+                            }
+                            COMPLETED_TASKS -> if (task.isCompleted) {
+                                tasksToShow.add(task)
+                            }
+                            else -> result.postValue(Error(Exception("NotImplemented")))
                         }
-                        COMPLETED_TASKS -> if (task.isCompleted) {
-                            tasksToShow.add(task)
-                        }
-                        else -> result.postValue(Error(Exception("NotImplemented")))
                     }
+                    result.postValue(Success(tasksToShow))
+                } else {
+                    result.postValue(tasksResult)
                 }
-                result.postValue(Success(tasksToShow))
+            } catch (e: Exception) {
+                result.postValue(Error(e))
             }
-            result.postValue(tasksResult)
-            Timber.e("postValue")
         }
     }
 
