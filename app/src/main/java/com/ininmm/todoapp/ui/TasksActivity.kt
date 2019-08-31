@@ -2,7 +2,6 @@ package com.ininmm.todoapp.ui
 
 import android.app.Activity
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -17,6 +16,7 @@ import com.ininmm.todoapp.data.model.Task
 import com.ininmm.todoapp.data.repository.ITasksRepository
 import com.ininmm.todoapp.data.source.local.TasksLocalDataSource
 import dagger.android.AndroidInjection
+import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
-class TasksActivity : AppCompatActivity() {
+class TasksActivity : DaggerAppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var appBarConfiguration: AppBarConfiguration
