@@ -22,7 +22,7 @@ data class Task @JvmOverloads constructor(
     var id: String = UUID.randomUUID().toString()
 ) {
     val titleForList: String
-        get() = if (title.isNotEmpty()) titleForList else description
+        get() = if (title.isNotEmpty()) title else description
 
     val isActive
         get() = !isCompleted

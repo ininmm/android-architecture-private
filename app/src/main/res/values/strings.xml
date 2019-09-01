@@ -21,5 +21,12 @@
     <string name="completed_tasks_cleared">Completed tasks cleared</string>
     <string name="tasks_marked_complete">Task marked complete</string>
     <string name="task_marked_active">Task marked actice</string>
+    <string name="menu_filter">Filter</string>
+    <string name="menu_clear">Clear completed</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="nav_all">All</string>
+    <string name="nav_active">Active</string>
+    <string name="nav_completed">Completed</string>
+    <string name="add_task">New Task</string>
 </resources>
 

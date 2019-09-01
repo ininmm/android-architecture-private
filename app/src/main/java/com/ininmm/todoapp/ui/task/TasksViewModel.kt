@@ -86,16 +86,14 @@ class TasksViewModel @Inject constructor(
                     when (it) {
                         is Success -> {
                             isDataLoadingError.postValue(false)
-                            _openTaskEvent.postValue(Event(it.data[0].id))
-                            Timber.e("Success:Snackbar post")
+                            Timber.i("loadTasks Success:${it.data}")
                             _items.postValue(it.data)
                         }
                         is Error -> {
                             isDataLoadingError.postValue(true)
-                            _openTaskEvent.postValue(Event(it.exception.message.toString()))
                             _items.postValue(emptyList())
                             showSnackbarMessage(R.string.loading_tasks_error)
-                            Timber.e("Error:Snackbar post")
+                            it.exception.printStackTrace()
                         }
                     }
                     _dataLoading.value = false
