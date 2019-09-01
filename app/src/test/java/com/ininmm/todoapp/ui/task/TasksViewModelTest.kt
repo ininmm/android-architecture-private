@@ -18,7 +18,6 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
 import org.junit.After
@@ -55,7 +54,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun loadAlTasksFromRepositoryThenLoadingTogglesAndDataLoaded() = runBlockingTest {
+    fun loadAlTasksFromRepositoryThenLoadingTogglesAndDataLoaded() {
         coEvery { tasksRepository.getTasks(any()) } returns Success(createTasks())
 
         mainCoroutineRule.pauseDispatcher()
@@ -73,7 +72,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun loadActiveTasksFromRepositoryThenLoadIntoView() = runBlockingTest {
+    fun loadActiveTasksFromRepositoryThenLoadIntoView() {
         coEvery { tasksRepository.getTasks(any()) } returns Success(createTasks())
 
         tasksViewModel.setFiltering(ACTIVE_TASKS)
@@ -86,7 +85,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun loadCompletedTasksFromRepositoryAndLoadIntoView() = runBlockingTest {
+    fun loadCompletedTasksFromRepositoryAndLoadIntoView() {
 
         coEvery { tasksRepository.getTasks(true) } returns Success(createTasks())
 
@@ -100,7 +99,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun loadTasksThenError() = runBlockingTest {
+    fun loadTasksThenError() {
         coEvery { tasksRepository.getTasks(any()) } throws Exception()
 
         tasksViewModel.isDataLoadingError.observeForever {}
@@ -113,7 +112,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun clickOnFabThenShowsAddTasksUi() = runBlockingTest {
+    fun clickOnFabThenShowsAddTasksUi() {
         tasksViewModel.addNewTask()
 
         val value = LiveDataTestUtil.getValue(tasksViewModel.newTaskEvent)
@@ -121,7 +120,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun clickOnOpenTaskThenSetsEvent() = runBlockingTest {
+    fun clickOnOpenTaskThenSetsEvent() {
         val taskId = "1234"
         tasksViewModel.openTask(taskId)
 
@@ -129,7 +128,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun clearCompletedTasksThenClearsTasks() = mainCoroutineRule.runBlockingTest {
+    fun clearCompletedTasksThenClearsTasks() {
         coEvery { tasksRepository.clearCompletedTasks() } just Runs
         coEvery { tasksRepository.getTasks(any()) } returns Success(createTasks().filter { it.isActive })
 
@@ -146,7 +145,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun showEditResultMessageAndEditOkThenSnackbarUpdated() = runBlockingTest {
+    fun showEditResultMessageAndEditOkThenSnackbarUpdated() {
         tasksViewModel.showEditResultMessage(EDIT_RESULT_OK)
 
         assertSnackbarmessage(
@@ -156,7 +155,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun showEditResultMessageAndAddOkThenSnackbarUpdated() = runBlockingTest {
+    fun showEditResultMessageAndAddOkThenSnackbarUpdated() {
         tasksViewModel.showEditResultMessage(ADD_EDIT_RESULT_OK)
 
         assertSnackbarmessage(
@@ -166,7 +165,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun showEditResultMessageAndDeleteOkThenSnackbarUpdated() = runBlockingTest {
+    fun showEditResultMessageAndDeleteOkThenSnackbarUpdated() {
         tasksViewModel.showEditResultMessage(DELETE_RESULT_OK)
 
         assertSnackbarmessage(
@@ -176,7 +175,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun completeTaskThenDataAndSnackbarUpdated() = runBlockingTest {
+    fun completeTaskThenDataAndSnackbarUpdated() {
         val task = createTasks()[0]
         coEvery { tasksRepository.completeTask(task) } just Runs
 
@@ -187,7 +186,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun activateTaskThenDataAndSnackbarUpdated() = runBlockingTest {
+    fun activateTaskThenDataAndSnackbarUpdated() {
         val task = createTasks()[1]
         coEvery { tasksRepository.completeTask(task) } just Runs
 
@@ -198,7 +197,7 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun getTasksAddViewVisible() = runBlockingTest {
+    fun getTasksAddViewVisible() {
         tasksViewModel.setFiltering(ALL_TASKS)
 
         Truth.assertThat(LiveDataTestUtil.getValue(tasksViewModel.tasksAddViewVisible)).isTrue()
