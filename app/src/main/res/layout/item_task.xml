@@ -26,7 +26,7 @@
         android:paddingBottom="@dimen/list_item_padding">
 
         <CheckBox
-            android:id="@+id/itemTitle"
+            android:id="@+id/itemComplete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -34,6 +34,7 @@
             android:onClick="@{(view) -> viewmodel.completeTask(task, ((CompoundButton)view).isChecked())}" />
 
         <TextView
+            android:id="@+id/itemTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
