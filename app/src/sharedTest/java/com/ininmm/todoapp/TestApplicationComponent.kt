@@ -1,12 +1,12 @@
-package com.ininmm.todoapp.di
+package com.ininmm.todoapp
 
 import android.content.Context
-import com.ininmm.todoapp.TodoApplication
-import com.ininmm.todoapp.di.module.ApplicationModule
-import com.ininmm.todoapp.di.module.data.DataModule
+import com.ininmm.todoapp.data.repository.ITasksRepository
+import com.ininmm.todoapp.di.ViewModelBuilder
 import com.ininmm.todoapp.di.module.data.local.DatabaseModule
 import com.ininmm.todoapp.di.module.data.remote.NetworkModule
 import com.ininmm.todoapp.di.module.ui.ActivityBindingModule
+import com.ininmm.todoapp.di.module.ui.task.TasksModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
@@ -16,19 +16,22 @@ import javax.inject.Singleton
 @Singleton
 @Component(
     modules = [
+        TestApplicationModule::class,
         AndroidSupportInjectionModule::class,
-        ApplicationModule::class,
         ActivityBindingModule::class,
+        TasksModule::class,
         ViewModelBuilder::class,
-        DataModule::class,
         DatabaseModule::class,
-        NetworkModule::class
+        NetworkModule::class,
+        TestDataModule::class
     ]
 )
-interface ApplicationComponent : AndroidInjector<TodoApplication> {
+interface TestApplicationComponent : AndroidInjector<TestTodoApplication> {
 
     @Component.Factory
     interface Factory {
-        fun create(@BindsInstance applicationContext: Context): ApplicationComponent
+        fun create(@BindsInstance applicationContext: Context): TestApplicationComponent
     }
+
+    val tasksRepository: ITasksRepository
 }
