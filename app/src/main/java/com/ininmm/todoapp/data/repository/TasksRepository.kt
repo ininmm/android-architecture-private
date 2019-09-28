@@ -28,6 +28,7 @@ class TasksRepository @Inject constructor(
             return withContext(ioDispatcher) {
                 if (!forceUpdate) {
                     cachedTasks?.let { cachedTasks ->
+                        Timber.e("getTasks and cache：$cachedTasks")
                         return@withContext Success(cachedTasks.values.sortedBy { it.id })
                     }
                 }
@@ -87,12 +88,14 @@ class TasksRepository @Inject constructor(
         }
     }
 
-    override suspend fun completeTask(task: Task) = withContext(ioDispatcher) {
+    override suspend fun completeTask(task: Task) {
         cacheAndPerform(task) {
             it.isCompleted = true
             coroutineScope {
                 launch { tasksRemoteDataSource.completeTask(it) }
-                launch { tasksRemoteDataSource.completeTask(it) }
+                launch {
+                    tasksLocalDataSource.completeTask(it)
+                }
             }
         }
     }
@@ -105,7 +108,7 @@ class TasksRepository @Inject constructor(
         }
     }
 
-    override suspend fun activateTask(task: Task) = withContext(ioDispatcher) {
+    override suspend fun activateTask(task: Task) {
         cacheAndPerform(task) {
             it.isCompleted = false
             coroutineScope {
@@ -222,6 +225,7 @@ class TasksRepository @Inject constructor(
             cachedTasks = ConcurrentHashMap()
         }
         cachedTasks?.put(cachedTask.id, cachedTask)
+        Timber.e("cacheTask:$cachedTask")
         return cachedTask
     }
 

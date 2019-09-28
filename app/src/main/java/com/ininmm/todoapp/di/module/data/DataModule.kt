@@ -1,15 +1,16 @@
 package com.ininmm.todoapp.di.module.data
 
-import com.ininmm.todoapp.data.source.TasksDataSource
-import com.ininmm.todoapp.data.source.remote.TasksRemoteDataSource
+import com.ininmm.todoapp.di.module.data.local.DatabaseModule
+import com.ininmm.todoapp.di.module.data.remote.NetworkModule
 import dagger.Module
-import dagger.Provides
 import javax.inject.Qualifier
 
 @Module(
     includes = [
-        DataBinds::class,
-        RepositoryBinds::class
+        DataSourceModule::class,
+        RepositoryBinds::class,
+        DatabaseModule::class,
+        NetworkModule::class
     ]
 )
 class DataModule {
@@ -21,10 +22,4 @@ class DataModule {
     @Qualifier
     @Retention(AnnotationRetention.RUNTIME)
     annotation class TasksRemoteData
-
-    @TasksRemoteData
-    @Provides
-    fun provideTasksRemoteDataSource(): TasksDataSource {
-        return TasksRemoteDataSource
-    }
 }

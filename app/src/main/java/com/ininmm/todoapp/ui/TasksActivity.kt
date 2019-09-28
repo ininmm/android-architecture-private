@@ -42,9 +42,9 @@ class TasksActivity : DaggerAppCompatActivity() {
     lateinit var repository: ITasksRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tasks)
-        AndroidInjection.inject(this)
         initView()
 
         GlobalScope.launch {

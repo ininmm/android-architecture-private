@@ -1,6 +1,6 @@
 package com.ininmm.todoapp.domain
 
-import com.ininmm.todoapp.Result
+import com.ininmm.todoapp.Result.Error
 import com.ininmm.todoapp.Result.Success
 import com.ininmm.todoapp.data.model.Task
 import com.ininmm.todoapp.data.repository.ITasksRepository
@@ -8,15 +8,20 @@ import com.ininmm.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
-class CompleteTaskUseCase @Inject constructor(
+class FakeActivateTaskUseCase @Inject constructor(
     private val tasksRepository: ITasksRepository,
     ioDispatcher: CoroutineDispatcher
-) : UseCase<CompleteTaskUseCase.Params, Unit>(ioDispatcher) {
-    override suspend fun execute(parameters: CompleteTaskUseCase.Params): Result<Unit> {
+) : MediatorUseCase<Task, Unit>(ioDispatcher) {
+
+    override suspend fun execute(parameters: Task) {
+
         wrapEspressoIdlingResource {
-            return Success(tasksRepository.completeTask(parameters.task))
+            try {
+                tasksRepository.activateTask(parameters)
+                result.postValue(Success(Unit))
+            } catch (e: Exception) {
+                result.postValue(Error(e))
+            }
         }
     }
-
-    data class Params(val task: Task)
 }

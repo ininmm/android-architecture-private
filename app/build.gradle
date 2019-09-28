@@ -34,6 +34,7 @@ android {
         debug {
             minifyEnabled false
             testCoverageEnabled true
+            resValue("string", "PORT_NUMBER", "8081")
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
         }
         release {
@@ -75,6 +76,7 @@ dependencies {
     implementation "androidx.room:room-runtime:$roomVersion"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt "androidx.room:room-compiler:$roomVersion"
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
 
     // Architecture Components
     implementation "androidx.room:room-runtime:$roomVersion"

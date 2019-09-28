@@ -12,7 +12,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.ininmm.todoapp.R
 import com.ininmm.todoapp.databinding.FragmentTasksBinding
-import com.ininmm.todoapp.util.observe
 import com.ininmm.todoapp.util.observeEventNotNull
 import com.ininmm.todoapp.util.setupRefreshLayout
 import com.ininmm.todoapp.util.setupSnackbar
@@ -71,7 +70,6 @@ class TasksFragment : DaggerFragment() {
         super.onActivityCreated(savedInstanceState)
 
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
-        setupDataLoadingError()
         setupSnackbar()
         setupListAdapter()
         setupRefreshLayout(viewDataBinding.tasksRefreshLayout, viewDataBinding.tasksList)
@@ -133,18 +131,12 @@ class TasksFragment : DaggerFragment() {
         findNavController().navigate(action)
     }
 
-    private fun setupDataLoadingError() {
-        viewModel.isDataLoadingError.observe(this) {
-            Timber.e("Observe isDataLoadingError: $it")
-        }
-    }
-
     private fun setupNavigation() {
         viewModel.openTaskEvent.observeEventNotNull(this) {
             Timber.e("Observe LiveData: $it")
             openTaskDetails(it)
         }
-        viewModel.newTaskEvent.observe(this) {
+        viewModel.newTaskEvent.observeEventNotNull(this) {
             navigateToAddNewTask()
         }
     }
