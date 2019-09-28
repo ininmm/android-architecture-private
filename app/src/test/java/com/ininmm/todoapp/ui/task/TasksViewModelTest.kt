@@ -59,7 +59,6 @@ class TasksViewModelTest {
 
         mainCoroutineRule.pauseDispatcher()
         tasksViewModel.setFiltering(ALL_TASKS)
-        tasksViewModel.isDataLoadingError.observeForever {}
         tasksViewModel.loadTasks(true)
         assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading), `is`(true))
 
@@ -77,7 +76,6 @@ class TasksViewModelTest {
 
         tasksViewModel.setFiltering(ACTIVE_TASKS)
 
-        tasksViewModel.isDataLoadingError.observeForever {}
         tasksViewModel.loadTasks(true)
 
         assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading), `is`(false))
@@ -91,7 +89,6 @@ class TasksViewModelTest {
 
         tasksViewModel.setFiltering(COMPLETED_TASKS)
 
-        tasksViewModel.isDataLoadingError.observeForever {}
         tasksViewModel.loadTasks(true)
 
         assertFalse(LiveDataTestUtil.getValue(tasksViewModel.dataLoading))
@@ -102,7 +99,6 @@ class TasksViewModelTest {
     fun loadTasksThenError() {
         coEvery { tasksRepository.getTasks(any()) } throws Exception()
 
-        tasksViewModel.isDataLoadingError.observeForever {}
         tasksViewModel.loadTasks(true)
 
         assertFalse(LiveDataTestUtil.getValue(tasksViewModel.dataLoading))
@@ -132,7 +128,6 @@ class TasksViewModelTest {
         coEvery { tasksRepository.clearCompletedTasks() } just Runs
         coEvery { tasksRepository.getTasks(any()) } returns Success(createTasks().filter { it.isActive })
 
-        tasksViewModel.isDataLoadingError.observeForever {}
         tasksViewModel.clearCompletedTasks()
         tasksViewModel.loadTasks(true)
 
@@ -178,19 +173,23 @@ class TasksViewModelTest {
     fun completeTaskThenDataAndSnackbarUpdated() {
         val task = createTasks()[0]
         coEvery { tasksRepository.completeTask(task) } just Runs
+        coEvery { tasksRepository.getTasks(any()) } returns Success(emptyList())
 
         tasksViewModel.completeTask(task, true)
+
         coVerify { tasksRepository.completeTask(task) }
 
-        assertSnackbarmessage(tasksViewModel.snackbarMessage, R.string.tasks_marked_complete)
+        assertSnackbarmessage(tasksViewModel.snackbarMessage, R.string.task_marked_complete)
     }
 
     @Test
     fun activateTaskThenDataAndSnackbarUpdated() {
         val task = createTasks()[1]
         coEvery { tasksRepository.completeTask(task) } just Runs
+        coEvery { tasksRepository.getTasks(any()) } returns Success(emptyList())
 
         tasksViewModel.completeTask(task, false)
+
         coVerify { tasksRepository.activateTask(task) }
 
         assertSnackbarmessage(tasksViewModel.snackbarMessage, R.string.task_marked_active)

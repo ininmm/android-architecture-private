@@ -1,7 +1,7 @@
 package com.ininmm.todoapp.domain
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.ininmm.todoapp.LiveDataTestUtil
+import com.ininmm.todoapp.MainCoroutineRule
 import com.ininmm.todoapp.Result.Success
 import com.ininmm.todoapp.data.model.Task
 import com.ininmm.todoapp.data.repository.ITasksRepository
@@ -29,6 +29,9 @@ class GetTasksUseCaseTest {
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    @get:Rule
+    var mainCoroutineRule = MainCoroutineRule()
+
     @MockK
     private lateinit var tasksRepository: ITasksRepository
 
@@ -46,11 +49,9 @@ class GetTasksUseCaseTest {
         coEvery { tasksRepository.getTasks(any()) } returns Success(emptyList())
 
         // WHEN
-        val resultLiveData = getTasksUseCase.observe()
-        getTasksUseCase.execute(createParams(true, ALL_TASKS))
+        val result = getTasksUseCase(createParams(true, ALL_TASKS))
 
         // THEN
-        val result = LiveDataTestUtil.getValue(resultLiveData)
         assertThat(result.succeeded, `is`(true))
         result as Success
         assertTrue(result.data.isEmpty())
@@ -60,10 +61,8 @@ class GetTasksUseCaseTest {
     fun loadTasks_error() = runBlockingTest {
         coEvery { tasksRepository.getTasks(any()) } throws Exception()
 
-        val resultLiveData = getTasksUseCase.observe()
-        getTasksUseCase.execute(createParams(false, ALL_TASKS))
+        val result = getTasksUseCase(createParams(false, ALL_TASKS))
 
-        val result = LiveDataTestUtil.getValue(resultLiveData)
         assertFalse(result.succeeded)
     }
 
@@ -71,10 +70,8 @@ class GetTasksUseCaseTest {
     fun loadTasks_noFilter() = runBlockingTest {
         coEvery { tasksRepository.getTasks(any()) } returns Success(createTestTasks())
 
-        val resultLiveData = getTasksUseCase.observe()
-        getTasksUseCase.execute(createParams(false, ALL_TASKS))
+        val result = getTasksUseCase(createParams(false, ALL_TASKS))
 
-        val result = LiveDataTestUtil.getValue(resultLiveData)
         assertTrue(result.succeeded)
         result as Success
         assertThat(result.data.size, `is`(3))
@@ -84,10 +81,8 @@ class GetTasksUseCaseTest {
     fun loadTasks_completedFilter() = runBlockingTest {
         coEvery { tasksRepository.getTasks(any()) } returns Success(createTestTasks())
 
-        val resultLiveData = getTasksUseCase.observe()
-        getTasksUseCase.execute(createParams(false, COMPLETED_TASKS))
+        val result = getTasksUseCase(createParams(false, COMPLETED_TASKS))
 
-        val result = LiveDataTestUtil.getValue(resultLiveData)
         assertTrue(result.succeeded)
         result as Success
         assertThat(result.data.size, `is`(2))
@@ -97,10 +92,8 @@ class GetTasksUseCaseTest {
     fun loadTasks_activeFilter() = runBlockingTest {
         coEvery { tasksRepository.getTasks(any()) } returns Success(createTestTasks())
 
-        val resultLiveData = getTasksUseCase.observe()
-        getTasksUseCase.execute(createParams(false, ACTIVE_TASKS))
+        val result = getTasksUseCase(createParams(false, ACTIVE_TASKS))
 
-        val result = LiveDataTestUtil.getValue(resultLiveData)
         assertTrue(result.succeeded)
         result as Success
         assertThat(result.data.size, `is`(1))

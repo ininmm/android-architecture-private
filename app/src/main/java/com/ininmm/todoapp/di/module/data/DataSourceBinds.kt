@@ -12,4 +12,3 @@ abstract class DataSourceBinds {
     @Binds
     abstract fun bindToTasksLocalData(tasksLocalDataSource: TasksLocalDataSource): TasksDataSource
 }
-
