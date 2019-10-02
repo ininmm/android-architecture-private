@@ -8,7 +8,7 @@ fun assertLiveDataEventTriggered(
     liveData: LiveData<Event<String>>,
     taskId: String
 ) {
-    val value = LiveDataTestUtil.getValue(liveData)
+    val value = liveData.getOrAwaitValue()
     assertThat(value.getContentIfNotHandled(), `is`(taskId))
 }
 
@@ -16,6 +16,6 @@ fun assertSnackbarmessage(
     snackbarLiveData: LiveData<Event<Int>>,
     messageId: Int
 ) {
-    val value = LiveDataTestUtil.getValue(snackbarLiveData)
+    val value = snackbarLiveData.getOrAwaitValue()
     assertThat(value.getContentIfNotHandled(), `is`(messageId))
 }

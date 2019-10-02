@@ -18,6 +18,7 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
 import org.junit.After
@@ -60,14 +61,14 @@ class TasksViewModelTest {
         mainCoroutineRule.pauseDispatcher()
         tasksViewModel.setFiltering(ALL_TASKS)
         tasksViewModel.loadTasks(true)
-        assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading), `is`(true))
+        assertThat(tasksViewModel.dataLoading.getOrAwaitValue(), `is`(true))
 
         mainCoroutineRule.resumeDispatcher()
 
-        val result = LiveDataTestUtil.getValue(tasksViewModel.dataLoading)
+        val result = tasksViewModel.dataLoading.getOrAwaitValue()
 
         assertThat(result, `is`(false))
-        assertThat(LiveDataTestUtil.getValue(tasksViewModel.items).size, `is`(3))
+        assertThat(tasksViewModel.items.getOrAwaitValue().size, `is`(3))
     }
 
     @Test
@@ -78,8 +79,8 @@ class TasksViewModelTest {
 
         tasksViewModel.loadTasks(true)
 
-        assertThat(LiveDataTestUtil.getValue(tasksViewModel.dataLoading), `is`(false))
-        assertThat(LiveDataTestUtil.getValue(tasksViewModel.items).size, `is`(1))
+        assertThat(tasksViewModel.dataLoading.getOrAwaitValue(), `is`(false))
+        assertThat(tasksViewModel.items.getOrAwaitValue().size, `is`(1))
     }
 
     @Test
@@ -91,8 +92,8 @@ class TasksViewModelTest {
 
         tasksViewModel.loadTasks(true)
 
-        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.dataLoading))
-        assertThat(LiveDataTestUtil.getValue(tasksViewModel.items).size, `is`(2))
+        assertFalse(tasksViewModel.dataLoading.getOrAwaitValue())
+        assertThat(tasksViewModel.items.getOrAwaitValue().size, `is`(2))
     }
 
     @Test
@@ -101,8 +102,8 @@ class TasksViewModelTest {
 
         tasksViewModel.loadTasks(true)
 
-        assertFalse(LiveDataTestUtil.getValue(tasksViewModel.dataLoading))
-        assertTrue(LiveDataTestUtil.getValue(tasksViewModel.items).isEmpty())
+        assertFalse(tasksViewModel.dataLoading.getOrAwaitValue())
+        assertTrue(tasksViewModel.items.getOrAwaitValue().isEmpty())
 
         assertSnackbarmessage(tasksViewModel.snackbarMessage, R.string.loading_tasks_error)
     }
@@ -111,7 +112,7 @@ class TasksViewModelTest {
     fun clickOnFabThenShowsAddTasksUi() {
         tasksViewModel.addNewTask()
 
-        val value = LiveDataTestUtil.getValue(tasksViewModel.newTaskEvent)
+        val value = tasksViewModel.newTaskEvent.getOrAwaitValue()
         Truth.assertThat(value.getContentIfNotHandled()).isNotNull()
     }
 
@@ -124,14 +125,14 @@ class TasksViewModelTest {
     }
 
     @Test
-    fun clearCompletedTasksThenClearsTasks() {
+    fun clearCompletedTasksThenClearsTasks() = mainCoroutineRule.runBlockingTest {
         coEvery { tasksRepository.clearCompletedTasks() } just Runs
         coEvery { tasksRepository.getTasks(any()) } returns Success(createTasks().filter { it.isActive })
 
         tasksViewModel.clearCompletedTasks()
         tasksViewModel.loadTasks(true)
 
-        val allTasks = LiveDataTestUtil.getValue(tasksViewModel.items)
+        val allTasks = tasksViewModel.items.getOrAwaitValue()
         val completedTasks = allTasks.filter { it.isCompleted }
 
         Truth.assertThat(completedTasks).isEmpty()
@@ -199,7 +200,7 @@ class TasksViewModelTest {
     fun getTasksAddViewVisible() {
         tasksViewModel.setFiltering(ALL_TASKS)
 
-        Truth.assertThat(LiveDataTestUtil.getValue(tasksViewModel.tasksAddViewVisible)).isTrue()
+        Truth.assertThat(tasksViewModel.tasksAddViewVisible.getOrAwaitValue()).isTrue()
     }
 
     @After
