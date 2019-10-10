@@ -11,61 +11,19 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.ininmm.todoapp.R
-import com.ininmm.todoapp.data.ToDoDatabase
-import com.ininmm.todoapp.data.model.Task
-import com.ininmm.todoapp.data.repository.ITasksRepository
-import com.ininmm.todoapp.data.source.local.TasksLocalDataSource
 import dagger.android.AndroidInjection
 import dagger.android.support.DaggerAppCompatActivity
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import timber.log.Timber
-import javax.inject.Inject
 
 class TasksActivity : DaggerAppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-    @Inject
-    lateinit var ioDispatcher: CoroutineDispatcher
-
-    @Inject
-    lateinit var roomDatabase: ToDoDatabase
-
-    @Inject
-    lateinit var tasksLocalDataSource: TasksLocalDataSource
-
-    @Inject
-    lateinit var repository: ITasksRepository
-
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tasks)
         initView()
-
-        GlobalScope.launch {
-            val task = Task(title = "abc", description = "Haha", isCompleted = false)
-            tryIo()
-
-            val tasks = roomDatabase.tasksDao().getTasks()
-            Timber.i("All Tasks from dao: $tasks")
-
-            val tasksLocal = tasksLocalDataSource.getTasks()
-            Timber.i("All Tasks from local data: $tasksLocal")
-
-            val tasksRepository = repository.getTasks()
-            Timber.e("All Tasks from repository: $tasksRepository")
-        }
-    }
-
-    private suspend fun tryIo() {
-        withContext(ioDispatcher) {
-            Timber.i("Current Thread: ${Thread.currentThread().name}")
-        }
     }
 
     private fun initView() {

@@ -3,10 +3,10 @@ package com.ininmm.todoapp
 import android.content.Context
 import com.ininmm.todoapp.data.repository.ITasksRepository
 import com.ininmm.todoapp.di.ViewModelBuilder
-import com.ininmm.todoapp.di.module.data.local.DatabaseModule
-import com.ininmm.todoapp.di.module.data.remote.NetworkModule
-import com.ininmm.todoapp.di.module.ui.ActivityBindingModule
+import com.ininmm.todoapp.di.module.ui.TasksActivityBinds
+import com.ininmm.todoapp.di.module.ui.statistics.StatisticsModule
 import com.ininmm.todoapp.di.module.ui.task.TasksModule
+import com.ininmm.todoapp.di.module.ui.taskdetail.TaskDetailModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
@@ -18,12 +18,12 @@ import javax.inject.Singleton
     modules = [
         TestApplicationModule::class,
         AndroidSupportInjectionModule::class,
-        ActivityBindingModule::class,
+        TasksActivityBinds::class,
         TasksModule::class,
-        ViewModelBuilder::class,
-        DatabaseModule::class,
-        NetworkModule::class,
-        TestDataModule::class
+        TaskDetailModule::class,
+        StatisticsModule::class,
+        TasksModule::class,
+        ViewModelBuilder::class
     ]
 )
 interface TestApplicationComponent : AndroidInjector<TestTodoApplication> {

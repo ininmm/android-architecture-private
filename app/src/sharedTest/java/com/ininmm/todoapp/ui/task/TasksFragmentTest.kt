@@ -283,7 +283,8 @@ class TasksFragmentTest {
     private fun launchActivity(): ActivityScenario<TasksActivity>? {
         val activityScenario = launch(TasksActivity::class.java)
         activityScenario.onActivity { activity ->
-            // disable animation in RecyclerView
+            // 因為現在的 Activity 在開啟時都會打開許多渲染及預設的動畫效果，
+            // 我們可以在這裡關閉一些不必要的功能以縮短測試執行時間
             (activity.findViewById(R.id.tasksList) as RecyclerView).itemAnimator = null
         }
         return activityScenario

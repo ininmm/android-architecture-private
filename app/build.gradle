@@ -8,14 +8,14 @@ apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion rootProject.compileSdkVersion
     defaultConfig {
         applicationId "com.ininmm.todoapp"
-        minSdkVersion 23
-        targetSdkVersion 28
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "com.ininmm.todoapp.CustomTestRunner"
+        testInstrumentationRunner 'com.ininmm.todoapp.CustomTestRunner'
     }
 
     android {
