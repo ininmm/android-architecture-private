@@ -6,13 +6,17 @@ import androidx.lifecycle.*
 import com.ininmm.todoapp.Event
 import com.ininmm.todoapp.R
 import com.ininmm.todoapp.Result.Success
+import com.ininmm.todoapp.data.api.SearchService
+import com.ininmm.todoapp.data.model.SearchRepo
 import com.ininmm.todoapp.data.model.Task
 import com.ininmm.todoapp.domain.*
 import com.ininmm.todoapp.ui.ADD_EDIT_RESULT_OK
 import com.ininmm.todoapp.ui.DELETE_RESULT_OK
 import com.ininmm.todoapp.ui.EDIT_RESULT_OK
 import com.ininmm.todoapp.util.wrapEspressoIdlingResource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,10 +63,27 @@ class TasksViewModel @Inject constructor(
         it.isEmpty()
     }
 
+    @Inject
+    lateinit var service: SearchService
+
+    private val _searchRepo = MutableLiveData<SearchRepo>()
+    val searchRepo: LiveData<SearchRepo> = _searchRepo
+
     init {
         // 設置初始狀態
         setFiltering(TasksFilterType.ALL_TASKS)
         loadTasks(true)
+    }
+
+    fun searchRepo() {
+        viewModelScope.launch {
+            _searchRepo.value = search()
+        }
+    }
+
+    private suspend fun search() = withContext(Dispatchers.IO) {
+        val result = service.searchRepo()
+        result
     }
 
     fun loadTasks(forceUpdate: Boolean) {

@@ -79,4 +79,6 @@ ext {
     rulesVersion = '1.0.1'
     timberVersion = '4.7.1'
     truthVersion = '0.44'
+    retrofitVersion = '2.6.1'
+    mockwebserverVersion = '3.8.1'
 }

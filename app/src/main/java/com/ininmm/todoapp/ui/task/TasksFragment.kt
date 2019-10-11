@@ -12,6 +12,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.ininmm.todoapp.R
 import com.ininmm.todoapp.databinding.FragmentTasksBinding
+import com.ininmm.todoapp.util.observe
 import com.ininmm.todoapp.util.observeEventNotNull
 import com.ininmm.todoapp.util.setupRefreshLayout
 import com.ininmm.todoapp.util.setupSnackbar
@@ -77,6 +78,11 @@ class TasksFragment : DaggerFragment() {
         setupFab()
 
         viewModel.loadTasks(true)
+
+        viewModel.searchRepo.observe(this) {
+            Timber.e(it?.toString())
+        }
+        viewModel.searchRepo()
     }
 
     override fun onAttach(context: Context) {
