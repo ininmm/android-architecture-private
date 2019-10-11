@@ -2,6 +2,7 @@ package com.ininmm.todoapp.di.module.ui
 
 import com.ininmm.todoapp.di.module.ui.statistics.StatisticsModule
 import com.ininmm.todoapp.di.module.ui.task.TasksModule
+import com.ininmm.todoapp.di.module.ui.taskdetail.TaskDetailModule
 import com.ininmm.todoapp.ui.TasksActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -14,6 +15,7 @@ abstract class ActivityBindingModule {
         modules = [
             TasksActivityBinds::class,
             TasksModule::class,
+            TaskDetailModule::class,
             StatisticsModule::class
         ]
     )

@@ -7,14 +7,17 @@ import com.ininmm.todoapp.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
-class ClearCompletedTasksUseCase @Inject constructor(
-    private val tasksRepository: ITasksRepository,
+class DeleteTaskUseCase @Inject constructor(
+    tasksRepository: ITasksRepository,
     ioDispatcher: CoroutineDispatcher
-) : UseCase<Unit, Unit>(ioDispatcher) {
+) : UseCase<DeleteTaskUseCase.Params, Unit>(ioDispatcher),
+    ITasksRepository by tasksRepository {
 
-    override suspend fun execute(parameters: Unit): Result<Unit> {
+    override suspend fun execute(parameters: DeleteTaskUseCase.Params): Result<Unit> {
         wrapEspressoIdlingResource {
-            return Success(tasksRepository.clearCompletedTasks())
+            return Success(deleteTask(parameters.taskId))
         }
     }
+
+    class Params(val taskId: String)
 }

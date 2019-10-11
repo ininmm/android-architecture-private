@@ -19,7 +19,7 @@
     <string name="successfully_added_task_message">Task added</string>
     <string name="successfully_deleted_task_message">Task wad deleted</string>
     <string name="completed_tasks_cleared">Completed tasks cleared</string>
-    <string name="tasks_marked_complete">Task marked complete</string>
+    <string name="task_marked_complete">Task marked complete</string>
     <string name="task_marked_active">Task marked actice</string>
     <string name="menu_filter">Filter</string>
     <string name="menu_clear">Clear completed</string>

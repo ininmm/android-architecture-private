@@ -1,5 +1,6 @@
 package com.ininmm.todoapp.domain
 
+import com.ininmm.todoapp.Result
 import com.ininmm.todoapp.data.model.Task
 import com.ininmm.todoapp.data.repository.ITasksRepository
 import com.ininmm.todoapp.util.wrapEspressoIdlingResource
@@ -10,9 +11,9 @@ class ActivateTaskUseCase @Inject constructor(
     private val tasksRepository: ITasksRepository,
     ioDispatcher: CoroutineDispatcher
 ) : UseCase<ActivateTaskUseCase.Params, Unit>(ioDispatcher) {
-    override suspend fun execute(parameters: Params) {
+    override suspend fun execute(parameters: ActivateTaskUseCase.Params): Result<Unit> {
         wrapEspressoIdlingResource {
-            tasksRepository.activateTask(task = parameters.task)
+            return Result.Success(tasksRepository.activateTask(task = parameters.task))
         }
     }
 

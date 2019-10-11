@@ -6,7 +6,8 @@ import dagger.Binds
 import dagger.Module
 
 @Module
-abstract class DataBinds {
+abstract class DataSourceBinds {
+
     @DataModule.TasksLocalData
     @Binds
     abstract fun bindToTasksLocalData(tasksLocalDataSource: TasksLocalDataSource): TasksDataSource
