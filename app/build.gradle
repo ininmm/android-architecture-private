@@ -18,15 +18,13 @@ android {
         testInstrumentationRunner 'com.ininmm.todoapp.CustomTestRunner'
     }
 
-    android {
-        sourceSets {
-            String sharedTestDir = 'src/sharedTest/java'
-            test {
-                java.srcDir sharedTestDir
-            }
-            androidTest {
-                java.srcDir sharedTestDir
-            }
+    sourceSets {
+        String sharedTestDir = 'src/sharedTest/java'
+        test {
+            java.srcDir sharedTestDir
+        }
+        androidTest {
+            java.srcDir sharedTestDir
         }
     }
 
@@ -52,6 +50,10 @@ android {
                 events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
             }
         }
+    }
+
+    lintOptions {
+        warning 'InvalidPackage'
     }
 
     dataBinding {
@@ -148,4 +150,9 @@ dependencies {
     // Using Dagger in androidTest and Robolectric too
     kaptAndroidTest "com.google.dagger:dagger-compiler:$daggerVersion"
     kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
+
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    implementation "com.squareup.okhttp3:mockwebserver:$mockwebserverVersion"
 }
